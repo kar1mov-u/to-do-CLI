@@ -4,7 +4,8 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"database/sql"
+	"github.com/kar1mov-u/to-do-CLI/db"
+
 	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -20,30 +21,8 @@ var addCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		task, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("Enter a new task").Show()
 
-		db, err := sql.Open("sqlite3", "./tasks.db")
-		if err != nil {
-			panic(err)
-		}
-		defer db.Close()
-
-		// dropQuery := `DROP TABLE tasks;`
-		// if _, err := db.Exec(dropQuery); err != nil {
-		// 	panic(err)
-		// }
-		createTableQuery := `
-			CREATE TABLE IF NOT EXISTS tasks(
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			title TEXT NOT NULL,
-			completed BOOLEAN,
-			completed_at DATETIME
-			);`
-
-		if _, err := db.Exec(createTableQuery); err != nil {
-			panic(err)
-		}
-
 		insertAuery := `INSERT INTO tasks (title,completed,completed_at) VALUES (?,?,CURRENT_TIMESTAMP);`
-		if _, err := db.Exec(insertAuery, task, false); err != nil {
+		if _, err := db.DB.Exec(insertAuery, task, false); err != nil {
 			panic(err)
 		}
 		fmt.Println("Task added successfully")
